@@ -1,13 +1,6 @@
 import random
 
 
-# sample steps
-
-# Write a function that creates a grid (map) where ships will be placed. The function
-# should take a list of coordinate pairs as an input, which represents the position of the
-# ship. The grid should be 10 spaces by 10 spaces big and for simplicity at the
-# beginning consider ships only one space big.
-
 def create_map(ship_coordinates):
     grid = [['.' for _ in range(10)] for _ in range(10)]  # Create a 10x10 grid filled with dots
 
@@ -23,10 +16,6 @@ def create_map(ship_coordinates):
         print()
 
 
-# Create a function that allows the user to select positions for their ships. Store this in
-# a format that your draw function from Step 1 can accept as an argument. Limit the
-# number of ships and verify that a position is not already taken or not outside of a
-# map. After the user selects their ships, draw a map using the function from point 1.
 
 def create_player_fleet(fleet):
     """a function that allows the user to select positions for their ships"""
@@ -52,10 +41,7 @@ def create_player_fleet(fleet):
     return ship_coordinates
 
 
-# Create a function that randomly places computer ships (also check that nothing
-# exists on target position), but does not display the board to the player.
-
-def create_computer_fleet(fleet):
+  def create_computer_fleet(fleet):
     """a function that randomly places computer ships"""
 
     pc_ship_coordinates = []
@@ -69,12 +55,6 @@ def create_computer_fleet(fleet):
                 valid_position = True
 
     return pc_ship_coordinates
-
-
-# Write a function where after asking for input, you check if the opponent's ship was
-# destroyed. If yes, remove the ship from the list of coordinates. create either two
-# functions (one for the player, second for the computer) or try setting default
-# arguments to a single function to play randomly for the computer.
 
 
 def player_move(computer_fleet):
@@ -105,12 +85,6 @@ def computer_move(player_fleet):
         player_fleet.remove(pc_move)
     else:
         print("The computer missed your ship.")
-
-
-# Let's put it together: write a main function where the player and computer (after
-# placing their ships) iterate in guessing the opponent's ship location. Keep score and
-# let players know their successes or misses. The game ends when one of the player's
-# lists of ships is empty. Congratulations! You have a game!
 
 
 def play_battleship(start_game):
