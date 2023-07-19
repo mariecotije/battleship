@@ -1,20 +1,14 @@
 import random
 
 
-# sample steps
-
-# Write a function that creates a grid (map) where ships will be placed. The function
-# should take a list of coordinate pairs as an input, which represents the position of the
-# ship. The grid should be 10 spaces by 10 spaces big and for simplicity at the
-# beginning consider ships only one space big.
-
 def create_map(ship_coordinates):
+    """A function that takes as an argument list of player's ship coordinates and prints a map with X as ship mark"""
     grid = [['.' for _ in range(10)] for _ in range(10)]  # Create a 10x10 grid filled with dots
 
     for coordinate in ship_coordinates:
-        x, y = coordinate
-        if 0 <= x < 10 and 0 <= y < 10:  # Check if the coordinate is within the grid boundaries
-            grid[y][x] = 'X'  # Place the ship at the specified coordinate
+        row, cell = coordinate
+        if 0 <= row < 10 and 0 <= cell < 10:  # Check if the coordinate is within the grid boundaries
+            grid[cell][row] = 'X'  # Place the ship at the specified coordinate
 
     # Print the map using nested for loops
     for row in grid:
@@ -23,117 +17,106 @@ def create_map(ship_coordinates):
         print()
 
 
-# Create a function that allows the user to select positions for their ships. Store this in
-# a format that your draw function from Step 1 can accept as an argument. Limit the
-# number of ships and verify that a position is not already taken or not outside of a
-# map. After the user selects their ships, draw a map using the function from point 1.
-
-def create_player_fleet(fleet):
-    """a function that allows the user to select positions for their ships"""
+def create_player_fleet():
+    """A function that asks player for ship coordinates one by one and returns a list of all ships coordinates.
+    The list is used for map"""
 
     ship_coordinates = []
-    for ship in range(3):
-        valid_position = False
-        while not valid_position:  # ask player to enter coordinates until there is enough amount of ships in the fleet
-            coordinate = input(f"Ahoy Captain! Enter the coordinates for ship {ship + 1} (x, y): ")
-            try:
-                x, y = map(int, coordinate.split(','))
-                if 0 <= x < 10 and 0 <= y < 10:  # Check if the coordinate is within the grid boundaries
-                    if (x, y) not in ship_coordinates:  # Check if the position is already taken
-                        ship_coordinates.append((x, y))
-                        valid_position = True
-                    else:
-                        print("Position already taken. Please select a different position.")
-                else:
-                    print("Position is out of the filed. Please enter values between 0 and 9.")
-            except ValueError:
-                print("Invalid input format. Please enter coordinates in the format 'x, y'.")
+    num_ships = 0  # total number of ships in the fleet
+
+    while num_ships < 2:  # Size of the fleet
+        print(f"Select position for Ship {num_ships + 1}")
+        input_coordinates = input('Enter two space separated numbers (0-9): ')  # user  input
+        coordinates = tuple(int(item) for item in input_coordinates.split())  # converting user input to tuple
+
+        #if input_coordinates < 0 or input_coordinates > 9 or input_coordinates < 0 or input_coordinates > 9:
+            #print("Invalid position. Try again.")
+            #continue
+
+        if coordinates in ship_coordinates:
+            print("Position already taken. Try again.")
+            continue
+
+        ship_coordinates.append(coordinates)  # adding a coordinates tuple to the list
+        num_ships += 1
 
     return ship_coordinates
 
 
-# Create a function that randomly places computer ships (also check that nothing
-# exists on target position), but does not display the board to the player.
+def create_computer_fleet():
+    """A function that places computer ships using random method.
+    If place is occupied, it tries again until fleet is completed"""
 
-def create_computer_fleet(fleet):
-    """a function that randomly places computer ships"""
-
-    pc_ship_coordinates = []
-    for ship in range(fleet):
+    computer_fleet = []
+    for ship in range(2):  # same size of the fleet
         valid_position = False
         while not valid_position:
-            x = random.randint(0, 9)
-            y = random.randint(0, 9)
-            if (x, y) not in pc_ship_coordinates:
-                pc_ship_coordinates.append((x, y))
+            row = random.randint(0, 9)
+            cell = random.randint(0, 9)
+            if (row, cell) not in computer_fleet:
+                computer_fleet.append((row, cell))  # adding a coordinates tuple to the list
                 valid_position = True
 
-    return pc_ship_coordinates
+    return computer_fleet
 
 
-# Write a function where after asking for input, you check if the opponent's ship was
-# destroyed. If yes, remove the ship from the list of coordinates. create either two
-# functions (one for the player, second for the computer) or try setting default
-# arguments to a single function to play randomly for the computer.
+def players_moves(computer_fleet, player_fleet):
+    """A function for main iteration between players.
+    User is making first move by inserting 2 numbers separated by space. Input is converted to tuple.
+    If the tuple is in the list of the user's fleet, the ship is destroyed and the tuple is removed from the list.
+    Next move is for computer.
+    Computer input is generated tuple from 2 random integers. The same logic for destroyed ship.
+    Iteration continues until one of the fleets is destroyed completely, means the list is empty."""
 
-
-def player_move(computer_fleet):
-    """a function that checks the ship status after player's move"""
-
-    player_move = input("Enter enemy ship coordinates: ")
-    try:
-        x, y = map(int, player_move.split(','))
-        if 0 <= x < 10 and 0 <= y < 10:
-            if (x, y) in computer_fleet:
-                print("Nice hit! Enemy ship was destroyed!")
-                computer_fleet.remove((x, y))
-            else:
-                print("Oops! You missed.")
-        else:
-            print("Invalid coordinates. Please enter values between 0 and 9.")
-    except ValueError:
-        print("Invalid input format. Please enter coordinates in the format 'x, y'.")
-
-
-def computer_move(player_fleet):
-    """a function that checks the ship status after pc move"""
-
-    pc_move = random.choice(player_fleet)
-    print(f"The computer sent a missile to: {pc_move[0]}, {pc_move[1]}")
-    if pc_move in player_fleet:
-        print("The computer hit your ship!")
-        player_fleet.remove(pc_move)
-    else:
-        print("The computer missed your ship.")
-
-
-# Let's put it together: write a main function where the player and computer (after
-# placing their ships) iterate in guessing the opponent's ship location. Keep score and
-# let players know their successes or misses. The game ends when one of the player's
-# lists of ships is empty. Congratulations! You have a game!
+    while computer_fleet != 0 and player_fleet != 0:
+        player_input = input('Enter space separated coordinates: ')  # user  input
+        coordinates = tuple(int(item) for item in player_input.split())  # converting user input to tuple
+        # check the ship was destroyed and remove from list of coordinates
+        if coordinates in computer_fleet:
+            print("Nice shot! A ship was destroyed!")
+            computer_fleet.remove(coordinates)
+        elif coordinates not in computer_fleet:
+            print(coordinates)
+            print("Missed! Don't worry, you will have another shot!")
+        # pc input
+        pc_choice_row = random.randint(0, 9)
+        pc_choice_cell = random.randint(0, 9)
+        pc_shot = (pc_choice_row, pc_choice_cell)  # creating tuple from both random inputs
+        print(f"Computer is sending missiles...")
+        if pc_shot in player_fleet:
+            print(f"Damn! Your ship at {pc_shot} was destroyed!")
+            computer_fleet.remove(pc_shot)
+        elif pc_shot not in player_fleet:
+            print(f"Computer missed at {pc_shot}")
 
 
 def play_battleship(start_game):
     """a main function where the player and computer iterate in guessing the opponent's ship location"""
+    # welcome message
+    print("Ahoy Captain! Let's create your fleet!")
 
-    # number of ships is reduced for testing, change back after finishing
+    # initial score for both players
+    user_score = 0
+    computer_score = 0
 
-    # the player and computer are placing their ships
-    fleet = 2
-    player_fleet = create_player_fleet(fleet)
-    create_map(player_fleet)
-    computer_fleet = create_computer_fleet(fleet)
-    print(computer_fleet)
+    # create fleet for the player
+    player_fleet = create_player_fleet()
+    create_map(player_fleet)  # create map after all ships are placed
+    print("Your fleet: ", player_fleet)
+
+    # fleet is created for pc
+    computer_fleet = create_computer_fleet()
+    print("computer: ", computer_fleet)  # just checking if it works, delete before sending!
 
     # iteration of moves in guessing the opponent's ship location
+    print("Let's destroy some enemy ships!")
 
+    players_moves(player_fleet, computer_fleet)
 
-    # Keep score and let players know their successes or misses
-
-    # game status
+    # game over
     if len(player_fleet) == 0:
         print("Ay, caramba! Your fleet was destroyed!")
-    else:
+    elif len(computer_fleet) == 0:
         print("Congratulations! You sunk all the computer's ships!")
 
 
