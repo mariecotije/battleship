@@ -75,17 +75,24 @@ def players_moves(computer_fleet, player_fleet):
         if coordinates in computer_fleet:
             print("Nice shot! A ship was destroyed!")
             computer_fleet.remove(coordinates)
+            print("Enemy fleet counts: ", len(computer_fleet))
+            if len(computer_fleet) == 0:
+                print("Congratulations! You sunk all the computer's ships! GAME OVER")
+                break
         elif coordinates not in computer_fleet:
             print(coordinates)
-            print("Missed! Don't worry, you will have another shot!")
+            print("Missed! Don't worry, you will have another shot! PC remain: ", computer_fleet)
         # pc input
-        pc_choice_row = random.randint(0, 9)
-        pc_choice_cell = random.randint(0, 9)
+        pc_choice_row = random.randint(0, 1)
+        pc_choice_cell = random.randint(0, 1)
         pc_shot = (pc_choice_row, pc_choice_cell)  # creating tuple from both random inputs
         print(f"Computer is sending missiles...")
         if pc_shot in player_fleet:
             print(f"Damn! Your ship at {pc_shot} was destroyed!")
-            computer_fleet.remove(pc_shot)
+            player_fleet.remove(pc_shot)
+            print("Ships remained in your fleet: ", len(player_fleet))
+            if len(player_fleet) == 0:
+                print("Ay, caramba! Your fleet was destroyed!")
         elif pc_shot not in player_fleet:
             print(f"Computer missed at {pc_shot}")
 
@@ -111,13 +118,7 @@ def play_battleship(start_game):
     # iteration of moves in guessing the opponent's ship location
     print("Let's destroy some enemy ships!")
 
-    players_moves(player_fleet, computer_fleet)
-
-    # game over
-    if len(player_fleet) == 0:
-        print("Ay, caramba! Your fleet was destroyed!")
-    elif len(computer_fleet) == 0:
-        print("Congratulations! You sunk all the computer's ships!")
+    players_moves(computer_fleet, player_fleet)
 
 
 start_game = True
