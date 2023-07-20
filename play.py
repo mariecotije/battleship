@@ -13,12 +13,13 @@ def play_battleship(start_game):
 
     # create fleet for the player
     player_fleet = create_player_fleet()
+    print("Your fleet is ready!")
     create_map(player_fleet)  # create map after all ships are placed
     print("Your fleet: ", player_fleet)
 
     # fleet is created for pc
     computer_fleet = create_computer_fleet()
-    print("computer: ", computer_fleet)  # just checking if it works, delete before sending!
+    print("Enemy's fleet is ready: ", computer_fleet)  # just checking if it works, delete before sending!
 
     # iteration of moves in guessing the opponent's ship location
     print("Let's destroy some enemy ships!")

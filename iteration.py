@@ -8,6 +8,13 @@ def players_moves(computer_fleet, player_fleet):
     Computer input is generated tuple from 2 random integers. The same logic for destroyed ship.
     Iteration continues until one of the fleets is destroyed completely, means the list is empty."""
 
+    messages = [
+        "You missed",
+        "Impressive shot, but missed",
+        "No ships at that point"
+    ]
+
+
     while computer_fleet != 0 and player_fleet != 0:
         player_input = input('Enter space separated coordinates: ')  # user  input
         coordinates = tuple(int(item) for item in player_input.split())  # converting user input to tuple
@@ -21,7 +28,9 @@ def players_moves(computer_fleet, player_fleet):
                 break
         elif coordinates not in computer_fleet:
             print(coordinates)
-            print("Missed! Don't worry, you will have another shot! PC remain: ", computer_fleet)  # delete before sending
+            print(random.choice(messages))  # show a random message form the list
+            print("PC remain: ", computer_fleet)  # delete before sending
+
         # pc input
         pc_choice_column = random.randint(0, 1)
         pc_choice_row = random.randint(0, 1)
