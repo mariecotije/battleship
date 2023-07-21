@@ -187,6 +187,7 @@ def players_moves(computer_fleet, player_fleet):
 
 def play_battleship(start_game):
     """a main function where the player and computer iterate in guessing the opponent's ship location"""
+
     # welcome message
     print("Ahoy Captain! Let's create your fleet!")
 
@@ -197,11 +198,11 @@ def play_battleship(start_game):
     # create fleet for the player
     player_fleet = enter_coordinates()
     create_map(player_fleet)  # create map after all ships are placed
-    print("Your fleet: ", player_fleet)
+    print("Your fleet is ready: ", player_fleet)
 
     # fleet is created for pc
     computer_fleet = create_computer_fleet()
-    print("computer: ", computer_fleet)  # just checking if it works, delete before sending!
+    print("Enemy fleet is ready: ", computer_fleet)  # just checking if it works, delete before sending!
 
     # iteration of moves in guessing the opponent's ship location
     print("Let's destroy some enemy ships!")
@@ -211,24 +212,8 @@ def play_battleship(start_game):
 start_game = True
 play_battleship(start_game)
 
-def play_game():
-    game_status = True
-    while game_status:
-        play_battleship(game_status)
-        try:
-            answer = str(input("Do you want to start new game? Press 'y' for new game or 'n'."))
-            if answer == 'y':
-                print("Let's start!")
-            elif answer == 'n':
-                game_status = False
-                print("Thank you for playing! Bye!")
-                break
-            else:
-                print("Sorry, I don't understand.Please answer 'y' for YES or 'n' for NO")
-                continue
-        except ValueError:
-            print("Please answer 'y' for YES or 'n' for NO")
-
+# def play_game():
+  #  """A main function for playing game"""
 
 
 
