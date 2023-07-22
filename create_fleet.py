@@ -3,17 +3,17 @@ from create_map import *
 
 def enter_coordinates():  # create any ship coordinates tuple
 
-    fleet = []  # the fleet is empty in the beginning
-
     # lists for verification of the amount of concrete types
     big_ship = []
     medium_ships = []
     small_ships = []
 
     ships = [2, 3, 5]  # list of ship sizes for verification of input ship_size
+
     min_allowed_value = 0
     max_allowed_value = 9
-    
+
+    fleet = []
     while len(fleet) != 17:  # run the process until all ships are created
 
         # ask player for the size of the ship to create
@@ -52,14 +52,24 @@ def enter_coordinates():  # create any ship coordinates tuple
                 if coordinates_column < min_allowed_value or coordinates_column > max_allowed_value:
                     print("This position is out of grid. Insert number 0-9.")
                     continue
+
                 coordinates_row = int(input(f"Input row coordinate for the ship deck {deck} : "))
                 if coordinates_row < min_allowed_value or coordinates_row > max_allowed_value:
                     print("This position is out of grid. Insert number 0-9.")
                     continue
+
                 if (coordinates_column, coordinates_row) not in fleet:  # if position is available, add to fleet
-                    fleet.append((coordinates_column, coordinates_row))
+                    if ship_size == 5:
+                        big_ship.append((coordinates_column, coordinates_row))
+                    elif ship_size == 3:
+                        medium_ships.append((coordinates_column, coordinates_row))
+                    elif ship_size == 2:
+                        small_ships.append((coordinates_column, coordinates_row))
+
                     ship_length += 1
                     deck += 1
+
+                    fleet = big_ship + medium_ships + small_ships  # join all lists to one for iteration
 
                 else:  # handling occupied position
                     print("You already placed ship there. Choose another position.")
@@ -67,18 +77,7 @@ def enter_coordinates():  # create any ship coordinates tuple
             except ValueError:  # handling incorrect input type
                 print("Only numbers are allowed. Try again.")
                 continue
-
-        # conditions for limit of ships and informing player of the ships position
-
-        if ship_size == 5:
-            big_ship.append("X")
-            print("Big ship: ", big_ship)
-        elif ship_size == 3:
-            medium_ships.append("X")
-            print("Medium ships: ", medium_ships)
-        elif ship_size == 2:
-            small_ships.append("X")
-            print("Small ships: ", small_ships)
+        print("Fleet: ", fleet)
 
     return fleet
 
