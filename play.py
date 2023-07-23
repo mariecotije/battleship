@@ -1,27 +1,20 @@
-from battleship import *
-import random
+def play_game():
+    game_status = True
+    print("test")
+    while game_status:
+        try:
+            answer = str(input("Do you want to start new game? Press 'y' for new game or 'n' for exit: "))
+            if answer == 'y':
+                print("Let's start!")
+            elif answer == 'n':
+                game_status = False
+                print("Thank you for playing! Bye!")
+                break
+            else:
+                print("Sorry, I don't understand. Please answer 'y' for YES or 'n' for NO")
+                continue
+        except ValueError:
+            print("Please answer 'y' for YES or 'n' for NO")
 
 
-def play_battleship(start_game):
-    """a main function where the player and computer iterate in guessing the opponent's ship location"""
-    # welcome message
-    print("Ahoy Captain! Let's create your fleet!")
-
-    # initial score for both players
-    user_score = 0
-    computer_score = 0
-
-    # create fleet for the player
-    player_fleet = create_player_fleet()
-    print("Your fleet is ready!")
-    create_map(player_fleet)  # create map after all ships are placed
-    print("Your fleet: ", player_fleet)
-
-    # fleet is created for pc
-    computer_fleet = create_computer_fleet()
-    print("Enemy's fleet is ready: ", computer_fleet)  # just checking if it works, delete before sending!
-
-    # iteration of moves in guessing the opponent's ship location
-    print("Let's destroy some enemy ships!")
-
-    players_moves(computer_fleet, player_fleet)
+play_game()
