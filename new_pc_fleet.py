@@ -1,6 +1,13 @@
 from create_map import *
 import random
 
+pc_fleet = []  # a list for all coordinates to check occupied
+
+# lists for checking target size in the iteration
+pc_big_ship = []  # a list for big ship
+pc_medium_ships = []  # a list for medium ships
+pc_small_ships = []  # a list for small ships
+
 
 def first_coordinates():
     """A function that randomly creates a tuple of coordinates"""
@@ -11,27 +18,26 @@ def first_coordinates():
 
 
 def is_enough_space(ship_size, chosen_orientation, start_coordinates):
-    # a check whether a ship can fit based on the start coordinates, orientation and ship size
+    # a check whether a ship can fit on the grid based on the start coordinates, orientation and ship size
     (column, row) = start_coordinates
+    grid_size = 10
 
-    if ship_size == 5 and chosen_orientation == "horizontal" and column <= 5:
-        return True
-    elif ship_size == 3 and chosen_orientation == "horizontal" and column <= 7:
-        return True
-    elif ship_size == 2 and chosen_orientation == "horizontal" and column <= 8:
-        return True
-    elif ship_size == 5 and chosen_orientation == "vertical" and row <= 5:
-        return True
-    elif ship_size == 3 and chosen_orientation == "horizontal" and row <= 7:
-        return True
-    elif ship_size == 2 and chosen_orientation == "horizontal" and row <= 8:
-        return True
-    else:
+    if chosen_orientation == "horizontal" and (grid_size - ship_size) < column:
         return False
+    elif chosen_orientation == "vertical" and (grid_size - ship_size) < row:
+        return False
+    else:
+        return True
 
 
-def position_not_occupied(ship):
-    pass
+def position_is_occupied(ship_coordinates):
+    """A function that checks coordinates in the whole fleet and returns response"""
+
+    for coordinates in ship_coordinates:
+        if coordinates in pc_fleet:
+            print(f"{ship_coordinates} is in fleet list")
+            return True
+    return False
 
 
 def create_ship(ship_size):
@@ -74,46 +80,41 @@ def create_ship(ship_size):
 def create_pc_fleet():
     print("Adding new ships to the fleet")
 
+    # create and add big ship to the main list
     pc_big_ship = create_ship(5)
+    pc_fleet.extend(pc_big_ship)
     print("Big ship created: ", pc_big_ship)
 
-    pc_medium_ships = []
-    for fleet in range(2):
+    while len(pc_medium_ships) != 6:
+        # create medium ships
         pc_medium_ship = create_ship(3)
-        pc_medium_ships.extend(pc_medium_ship)
+        if position_is_occupied(pc_medium_ship):
+            print("Position is occupied. Next loop.")
+            continue
+        else:
+            pc_fleet.extend(pc_medium_ship)
+            pc_medium_ships.extend(pc_medium_ship)
+
     print("Medium ships created: ", pc_medium_ships)
 
-    pc_small_ships = []
-    for fleet in range(3):
+    while len(pc_small_ships) != 6:
         pc_small_ship = create_ship(2)
-        pc_small_ships.extend(pc_small_ship)
-    print("Small ships created: ", pc_small_ships)
-
-    pc_fleet = []
-
-    occupied = False
-    while not occupied:
-        pc_fleet.extend(pc_big_ship)
-        occupied = True
-        pc_fleet.extend(pc_medium_ships)
-        occupied = True
-        pc_fleet.extend(pc_small_ships)
-        occupied = True
-        if pc_big_ship or pc_medium_ships or pc_small_ships in pc_fleet:
-            occupied = True
-            print("Position occupied, creating new ship.")
+        if position_is_occupied(pc_small_ship):
+            print("Position is occupied. Next loop.")
             continue
+        else:
+            pc_small_ships.extend(pc_small_ship)
+            pc_fleet.extend(pc_small_ship)
+
+    print("Small ships created: ", pc_small_ships)
 
     return pc_fleet
 
 
-pc_fleet = create_pc_fleet()
-print(pc_fleet)
-create_map(pc_fleet)
+def main():
+    pc_fleet = create_pc_fleet()
+    print(pc_fleet)
+    create_map(pc_fleet)
 
 
-
-
-
-
-
+main()

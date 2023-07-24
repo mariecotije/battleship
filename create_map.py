@@ -1,6 +1,6 @@
 def create_map(ship_coordinates):
     """A function that takes as an argument list of player's ship coordinates and prints a map with X as ship mark"""
-    grid = [['.' for _ in range(10)] for _ in range(10)]  # Create a 10x10 grid filled with dots
+    grid = [['.' for row in range(10)] for column in range(10)]  # Create a 10x10 grid filled with dots
 
     for coordinate in ship_coordinates:
         column, row = coordinate
@@ -12,3 +12,5 @@ def create_map(ship_coordinates):
         for row in column:
             print(row, end=' ')
         print()
+
+

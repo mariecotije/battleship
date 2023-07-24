@@ -13,11 +13,11 @@ def players_moves(computer_fleet, player_fleet):
     player_score = 0
     computer_score = 0
 
-    # messages to show when player hith the enemy ship
+    # messages to show when player hit the enemy ship
     messages = [
         "You missed",
         "Impressive shot, but missed",
-        "No ships at that point"
+        "No ships there"
     ]
 
     # main iteration loop
