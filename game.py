@@ -318,12 +318,12 @@ play_battleship(start_game)
 
 # a function for playing game again util player ends it
 
-# def play_game():
-  #  """A main function for playing game"""
+# def start_new_game():
+  #  """The main function for starting game"""
     # start_game = True
     # while start_game:
         #play_battleship(start_game)
-        # ask_player = str(input("Wanna play again? Y or N: "))
+        # ask_player = str(input("Do you want to play again? Y or N: "))
         # if ask_player == "y": return False
     # return True  ???
 
