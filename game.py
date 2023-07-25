@@ -1,6 +1,7 @@
 import random
 
 
+# create map for the player
 def create_map(ship_coordinates):
     """A function that takes as an argument list of player's ship coordinates and prints a map with X as ship mark"""
     grid = [['.' for _ in range(10)] for _ in range(10)]  # Create a 10x10 grid filled with dots
@@ -17,20 +18,24 @@ def create_map(ship_coordinates):
         print()
 
 
+# player's ships
+
+big_ship = []
+medium_ships = []
+small_ships = []
+
+
 # create player fleet
 def enter_coordinates():  # create any ship coordinates tuple
 
     # lists for verification of the amount of concrete types
-    big_ship = []
-    medium_ships = []
-    small_ships = []
+    fleet = []
 
     ships = [2, 3, 5]  # list of ship sizes for verification of input ship_size
 
     min_allowed_value = 0
     max_allowed_value = 9
 
-    fleet = []
     while len(fleet) != 17:  # run the process until all ships are created
 
         # ask player for the size of the ship to create
@@ -46,13 +51,13 @@ def enter_coordinates():  # create any ship coordinates tuple
                 continue
 
         # validation for the ships amount limit
-        if ship_size == 5 and len(big_ship) == 1:
+        if ship_size == 5 and len(big_ship) == 5:
             print("You already have big ship, choose another size.")
             continue
-        elif ship_size == 3 and len(medium_ships) == 2:
+        elif ship_size == 3 and len(medium_ships) == 6:
             print("You have reached the limit for medium ships.")
             continue
-        elif ship_size == 2 and len(small_ships) == 3:
+        elif ship_size == 2 and len(small_ships) == 6:
             print("You have reached the limit for small ships.")
             continue  # stop the iteration and ask again if the player already created some type of ships
 
@@ -94,28 +99,124 @@ def enter_coordinates():  # create any ship coordinates tuple
             except ValueError:  # handling incorrect input type
                 print("Only numbers are allowed. Try again.")
                 continue
-
-        print("Fleet: ", fleet)  # show already saved coordinates
+        print("Fleet: ", fleet)
 
     return fleet
 
 
+# create fleet for pc
+
+pc_fleet = []  # a list for all coordinates to check occupied
+
+# lists for checking target size in the iteration
+pc_big_ship = []  # a list for big ship
+pc_medium_ships = []  # a list for medium ships
+pc_small_ships = []  # a list for small ships
+
+
+def first_coordinates():
+    """A function that randomly creates a tuple of coordinates"""
+    column = random.randint(0, 9)
+    row = random.randint(0, 9)
+
+    return column, row
+
+
+def is_enough_space(ship_size, chosen_orientation, start_coordinates):
+    # a check whether a ship can fit on the grid based on the start coordinates, orientation and ship size
+    (column, row) = start_coordinates
+    grid_size = 10
+
+    if chosen_orientation == "horizontal" and (grid_size - ship_size) < column:
+        return False
+    elif chosen_orientation == "vertical" and (grid_size - ship_size) < row:
+        return False
+    else:
+        return True
+
+
+def position_is_occupied(ship_coordinates):
+    """A function that checks coordinates in the whole fleet and returns response"""
+
+    for coordinates in ship_coordinates:
+        if coordinates in pc_fleet:
+            print(f"{ship_coordinates} is in fleet list")
+            return True
+    return False
+
+
+def create_ship(ship_size):
+    # ship coordinates holder
+    new_ship = []
+
+    # create start coordinates
+    start_coordinates = first_coordinates()
+
+    # choose orientation
+    orientation = ["vertical", "horizontal"]
+    chosen_orientation = random.choice(orientation)
+
+    # check if coordinates are ok
+    while not is_enough_space(ship_size, chosen_orientation, start_coordinates):
+        # create start coordinates
+        start_coordinates = first_coordinates()
+
+        # choose orientation
+        orientation = ["vertical", "horizontal"]
+        chosen_orientation = random.choice(orientation)
+
+    # proceed with ship generation
+
+    # unpack tuple and create ship
+    (column, row) = start_coordinates
+    if chosen_orientation == "vertical":
+        for ship in range(ship_size):
+            new_ship.append((column, row))
+            row += 1
+
+    elif chosen_orientation == "horizontal":
+        for ship in range(ship_size):
+            new_ship.append((column, row))
+            column += 1
+
+    return new_ship
+
+
 def create_computer_fleet():
-    """A function that places computer ships using random method.
-    If place is occupied, it tries again until fleet is completed"""
+    print("Adding new ships to the fleet")
 
-    computer_fleet = []
-    for ship in range(2):  # same size of the fleet
-        valid_position = False
-        while not valid_position:
-            column = random.randint(0, 9)
-            row = random.randint(0, 9)
-            if (column, row) not in computer_fleet:
-                computer_fleet.append((column, row))  # adding a coordinates tuple to the list
-                valid_position = True
+    # create and add big ship to the main list
+    pc_big_ship = create_ship(5)
+    pc_fleet.extend(pc_big_ship)
+    print("Big ship created: ", pc_big_ship)
 
-    return computer_fleet
+    while len(pc_medium_ships) != 6:
+        # create medium ships
+        pc_medium_ship = create_ship(3)
+        if position_is_occupied(pc_medium_ship):
+            print("Position is occupied. Next loop.")
+            continue
+        else:
+            pc_fleet.extend(pc_medium_ship)
+            pc_medium_ships.extend(pc_medium_ship)
 
+    print("Medium ships created: ", pc_medium_ships)
+
+    while len(pc_small_ships) != 6:
+        pc_small_ship = create_ship(2)
+        if position_is_occupied(pc_small_ship):
+            print("Position is occupied. Next loop.")
+            continue
+        else:
+            pc_small_ships.extend(pc_small_ship)
+            pc_fleet.extend(pc_small_ship)
+
+    print("Small ships created: ", pc_small_ships)
+
+    return pc_fleet
+
+
+# iteration of moves
 
 def players_moves(computer_fleet, player_fleet):
     """A function for main iteration between players.
@@ -129,7 +230,7 @@ def players_moves(computer_fleet, player_fleet):
     player_score = 0
     computer_score = 0
 
-    # messages to show when player hith the enemy ship
+    # messages to show when player hit the enemy ship
     messages = [
         "You missed",
         "Impressive shot, but missed",
@@ -141,7 +242,7 @@ def players_moves(computer_fleet, player_fleet):
         try:
             player_input = input("Enter two space separated numbers 0-9 and press Enter: ")  # user  input
             coordinates = tuple(int(number) for number in player_input.split())  # converting user input to tuple
-            if len(coordinates) < 2 or len(coordinates) > 2:  # prevent sending user input if not 2 coordinates
+            if len(coordinates) < 2:  # prevent sending user input if not 2 coordinates
                 print("Two coordinates are needed for shot. Try again.")
                 continue
         except ValueError:  # prevent app from failing when user inserts non integer
@@ -173,12 +274,14 @@ def players_moves(computer_fleet, player_fleet):
             player_fleet.remove(pc_shot)
             print("Your fleet status: ", len(player_fleet))  # count of ships remained in the fleet
             computer_score += 1
-            print("Enemy's score: ", computer_score)
+            print(("PC score: ", computer_score))
             if len(player_fleet) == 0:
                 print("Ay, caramba! Your fleet was destroyed!")
         elif pc_shot not in player_fleet:
             print(f"Computer missed at {pc_shot}")
 
+
+# the main function for plain game
 
 def play_battleship(start_game):
     """a main function where the player and computer iterate in guessing the opponent's ship location"""
@@ -191,24 +294,39 @@ def play_battleship(start_game):
     computer_score = 0
 
     # create fleet for the player
-    player_fleet = enter_coordinates()
-    create_map(player_fleet)  # create map after all ships are placed
-    print("Your fleet is ready: ", player_fleet)
+    players_fleet = enter_coordinates()
+    create_map(players_fleet)  # create map after all ships are placed
+    print("Your fleet is ready: ", players_fleet)
+
+    # show ships filtered by size
+    print("Big ship", big_ship)
+    print("Medium ships", medium_ships)
+    print("Small ships", small_ships)
 
     # fleet is created for pc
     computer_fleet = create_computer_fleet()
-    print("Enemy fleet is ready: ", computer_fleet)  # just checking if it works, delete before sending!
+    print("Enemy fleet is ready: ", pc_fleet)  # just checking if it works, delete before sending!
 
     # iteration of moves in guessing the opponent's ship location
     print("Let's destroy some enemy ships!")
-    players_moves(computer_fleet, player_fleet)
+    players_moves(pc_fleet, players_fleet)
 
 
 start_game = True
 play_battleship(start_game)
 
+
+# a function for playing game again util player ends it
+
 # def play_game():
   #  """A main function for playing game"""
+    # start_game = True
+    # while start_game:
+        #play_battleship(start_game)
+        # ask_player = str(input("Wanna play again? Y or N: "))
+        # if ask_player == "y": return False
+    # return True  ???
+
 
 
 

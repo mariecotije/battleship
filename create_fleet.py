@@ -1,19 +1,21 @@
 from create_map import *
 
 
+big_ship = []
+medium_ships = []
+small_ships = []
+
+
 def enter_coordinates():  # create any ship coordinates tuple
 
     # lists for verification of the amount of concrete types
-    big_ship = []
-    medium_ships = []
-    small_ships = []
+    fleet = []
 
     ships = [2, 3, 5]  # list of ship sizes for verification of input ship_size
 
     min_allowed_value = 0
     max_allowed_value = 9
 
-    fleet = []
     while len(fleet) != 17:  # run the process until all ships are created
 
         # ask player for the size of the ship to create

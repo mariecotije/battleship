@@ -1,20 +1,19 @@
-def play_game():
-    game_status = True
-    print("test")
-    while game_status:
-        try:
-            answer = str(input("Do you want to start new game? Press 'y' for new game or 'n' for exit: "))
-            if answer == 'y':
-                print("Let's start!")
-            elif answer == 'n':
-                game_status = False
-                print("Thank you for playing! Bye!")
-                break
-            else:
-                print("Sorry, I don't understand. Please answer 'y' for YES or 'n' for NO")
-                continue
-        except ValueError:
-            print("Please answer 'y' for YES or 'n' for NO")
+if len(big_ship) == 5:
+    continue
+elif len(medium_ship) == 6:
+    continue
+elif len(small_ship) == 6:
+    continue
 
+    if len(ship) == 5:
+        big_ship.extend(ship)
+        print("Big: ", big_ship)
+    elif len(ship) == 3:
+        medium_ship.extend(ship)
+        print("Medium: ", medium_ship)
+    elif len(ship) == 2:
+        small_ship.extend(ship)
+        print("Small: ", small_ship)
 
-play_game()
+    fleet = big_ship + medium_ship + small_ship
+    print(len(fleet))
