@@ -106,7 +106,7 @@ def enter_coordinates():  # create any ship coordinates tuple
 
 # create fleet for pc
 
-pc_fleet = []  # a list for all coordinates to check occupied
+computer_fleet = []  # a list for all coordinates to check occupied
 
 # lists for checking target size in the iteration
 pc_big_ship = []  # a list for big ship
@@ -139,7 +139,7 @@ def position_is_occupied(ship_coordinates):
     """A function that checks coordinates in the whole fleet and returns response"""
 
     for coordinates in ship_coordinates:
-        if coordinates in pc_fleet:
+        if coordinates in computer_fleet:
             print(f"{ship_coordinates} is in fleet list")
             return True
     return False
@@ -183,37 +183,58 @@ def create_ship(ship_size):
 
 
 def create_computer_fleet():
-    print("Adding new ships to the fleet")
 
     # create and add big ship to the main list
-    pc_big_ship = create_ship(5)
-    pc_fleet.extend(pc_big_ship)
-    print("Big ship created: ", pc_big_ship)
+    create_pc_big_ship = create_ship(5)
+    pc_big_ship.extend(create_pc_big_ship)
+    computer_fleet.extend(pc_big_ship)
 
     while len(pc_medium_ships) != 6:
         # create medium ships
         pc_medium_ship = create_ship(3)
         if position_is_occupied(pc_medium_ship):
-            print("Position is occupied. Next loop.")
             continue
         else:
-            pc_fleet.extend(pc_medium_ship)
+            computer_fleet.extend(pc_medium_ship)
             pc_medium_ships.extend(pc_medium_ship)
-
-    print("Medium ships created: ", pc_medium_ships)
 
     while len(pc_small_ships) != 6:
         pc_small_ship = create_ship(2)
         if position_is_occupied(pc_small_ship):
-            print("Position is occupied. Next loop.")
             continue
         else:
             pc_small_ships.extend(pc_small_ship)
-            pc_fleet.extend(pc_small_ship)
+            computer_fleet.extend(pc_small_ship)
 
-    print("Small ships created: ", pc_small_ships)
+    return computer_fleet
 
-    return pc_fleet
+
+# checking size of the target for player
+
+def check_player_target_size(coordinates):
+    if coordinates in pc_big_ship:
+        print("You hit big ship of 5 decks!")
+        pc_big_ship.remove(coordinates)
+    elif coordinates in pc_medium_ships:
+        print("Nice! Medium ship is damaged!")
+        pc_medium_ships.remove(coordinates)
+    elif coordinates in pc_small_ships:
+        print("Small ship is hit!")
+        pc_small_ships.remove(coordinates)
+
+
+# checking the player's fleet status
+
+def check_pc_target_size(pc_shot):
+    if pc_shot in big_ship:
+        print("Oh no! Computer hit your biggest ship!")
+        big_ship.remove(pc_shot)
+    elif pc_shot in medium_ships:
+        print("Your medium size ship was hit by computer!")
+        medium_ships.remove(pc_shot)
+    elif pc_shot in small_ships:
+        print("Computer hit a small ship!")
+        small_ships.remove(pc_shot)
 
 
 # iteration of moves
@@ -237,6 +258,7 @@ def players_moves(computer_fleet, player_fleet):
         "No enemy ships there"
     ]
 
+    used_coordinates = []
     # main iteration loop
     while computer_fleet != 0 and player_fleet != 0:
         try:
@@ -245,43 +267,45 @@ def players_moves(computer_fleet, player_fleet):
             if len(coordinates) < 2:  # prevent sending user input if not 2 coordinates
                 print("Two coordinates are needed for shot. Try again.")
                 continue
+            elif coordinates in used_coordinates:
+                print("You already tried these coordinates. Insert another pair.")
+                continue
         except ValueError:  # prevent app from failing when user inserts non integer
             print("Please enter 2 space separated numbers in range 0-9.")
             continue
         else:
             if coordinates in computer_fleet:
-                print("Nice shot! A ship was hit!")
+                check_player_target_size(coordinates)
                 computer_fleet.remove(coordinates)
+                used_coordinates.append(coordinates)  # for checking already used coordinates
                 player_score += 1
                 print("Your score: ", player_score)
-                print("Enemy fleet status: ", len(computer_fleet))  # showing player the count of ships remained
                 if len(computer_fleet) == 0:
                     print("Congratulations! You sunk all the computer's ships! GAME OVER")
                     break
             elif coordinates not in computer_fleet:
-                print(coordinates)
+                print("Your shot: ", coordinates)
                 print(random.choice(messages))  # show a random message form the list
-                print("PC remain: ", computer_fleet)  # delete before sending
-                # check the ship was destroyed and remove from list of coordinates
+                used_coordinates.append(coordinates)  # for checking already used coordinates
 
         # computer turn
-        pc_choice_column = random.randint(0, 1)
-        pc_choice_row = random.randint(0, 1)
+        pc_choice_column = random.randint(0, 9)
+        pc_choice_row = random.randint(0, 9)
         pc_shot = (pc_choice_column, pc_choice_row)  # creating tuple from both random inputs
         print(f"Computer is sending missiles...")
         if pc_shot in player_fleet:
-            print(f"Damn! Your ship at {pc_shot} was hit!")
+            print(f"Damn! Enemy strike at {pc_shot} was successful!")
             player_fleet.remove(pc_shot)
-            print("Your fleet status: ", len(player_fleet))  # count of ships remained in the fleet
+            check_pc_target_size(pc_shot)
             computer_score += 1
-            print(("PC score: ", computer_score))
+            print("Computer score: ", computer_score)
             if len(player_fleet) == 0:
                 print("Ay, caramba! Your fleet was destroyed!")
         elif pc_shot not in player_fleet:
             print(f"Computer missed at {pc_shot}")
 
 
-# the main function for plain game
+# the main function for playing game
 
 def play_battleship(start_game):
     """a main function where the player and computer iterate in guessing the opponent's ship location"""
@@ -295,8 +319,8 @@ def play_battleship(start_game):
 
     # create fleet for the player
     players_fleet = enter_coordinates()
+    print("Your fleet is ready! Check the map.")
     create_map(players_fleet)  # create map after all ships are placed
-    print("Your fleet is ready: ", players_fleet)
 
     # show ships filtered by size
     print("Big ship", big_ship)
@@ -305,11 +329,11 @@ def play_battleship(start_game):
 
     # fleet is created for pc
     computer_fleet = create_computer_fleet()
-    print("Enemy fleet is ready: ", pc_fleet)  # just checking if it works, delete before sending!
+    print("Enemy fleet is ready.", computer_fleet)  # just checking if it works, delete before sending!
 
     # iteration of moves in guessing the opponent's ship location
-    print("Let's destroy some enemy ships!")
-    players_moves(pc_fleet, players_fleet)
+    print("Yo Ho, Ho! Let's destroy some enemy ships!")
+    players_moves(computer_fleet, players_fleet)
 
 
 start_game = True
