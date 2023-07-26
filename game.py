@@ -18,7 +18,7 @@ def create_map(ship_coordinates):
         print()
 
 
-# player's ships
+# player's ships (global scope)
 
 big_ship = []
 medium_ships = []
@@ -106,9 +106,9 @@ def enter_coordinates():  # create any ship coordinates tuple
 
 # create fleet for pc
 
-computer_fleet = []  # a list for all coordinates to check occupied
+computer_fleet = []  # a list for all coordinates to check occupied (global scope)
 
-# lists for checking target size in the iteration
+# lists for checking target size in the iteration (global scope)
 pc_big_ship = []  # a list for big ship
 pc_medium_ships = []  # a list for medium ships
 pc_small_ships = []  # a list for small ships
@@ -257,8 +257,9 @@ def players_moves(computer_fleet, player_fleet):
         "Impressive shot, but missed",
         "No enemy ships there"
     ]
-
+    # a list of already used coordinates for checking
     used_coordinates = []
+
     # main iteration loop
     while computer_fleet != 0 and player_fleet != 0:
         try:
@@ -288,7 +289,7 @@ def players_moves(computer_fleet, player_fleet):
                 print(random.choice(messages))  # show a random message form the list
                 used_coordinates.append(coordinates)  # for checking already used coordinates
 
-        # computer turn
+        # computer's turn
         pc_choice_column = random.randint(0, 9)
         pc_choice_row = random.randint(0, 9)
         pc_shot = (pc_choice_column, pc_choice_row)  # creating tuple from both random inputs
@@ -323,35 +324,30 @@ def play_battleship(start_game):
     create_map(players_fleet)  # create map after all ships are placed
 
     # show ships filtered by size
-    print("Big ship", big_ship)
-    print("Medium ships", medium_ships)
-    print("Small ships", small_ships)
+    print("Big ship: ", big_ship)
+    print("Medium ships: ", medium_ships)
+    print("Small ships: ", small_ships)
 
     # fleet is created for pc
     computer_fleet = create_computer_fleet()
-    print("Enemy fleet is ready.", computer_fleet)  # just checking if it works, delete before sending!
+    print("Enemy fleet is ready for battle.\nYo Ho, Ho! Let's destroy some enemy ships!", computer_fleet)
+    # just checking if it works, delete  computer fleet before sending!
 
     # iteration of moves in guessing the opponent's ship location
-    print("Yo Ho, Ho! Let's destroy some enemy ships!")
     players_moves(computer_fleet, players_fleet)
 
 
-start_game = True
-play_battleship(start_game)
-
-
 # a function for playing game again util player ends it
+def start_new_game():
+    """The main function for starting game"""
+    start_game = True
 
-# def start_new_game():
-  #  """The main function for starting game"""
-    # start_game = True
-    # while start_game:
-        #play_battleship(start_game)
-        # ask_player = str(input("Do you want to play again? Y or N: "))
-        # if ask_player == "y": return False
-    # return True  ???
-
-
-
+    while start_game:
+        play_battleship(start_game)
+        ask_player = str(input("Do you want to play again? Press any key for YES or 'n' for NO: "))
+        if ask_player == "n":
+            print("Thank you for playing! Good bye!")
+            break
 
 
+start_new_game()
