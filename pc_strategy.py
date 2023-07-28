@@ -19,29 +19,51 @@ def pc_random_shot():
 
 # pc_shot = pc_random_shot()
 
-
-def pc_near_shot():
+def pc_next_column_forward():
     last_successful_shot = pc_successful_shots[-1]
     print("Last hit:", last_successful_shot)
     (column, row) = last_successful_shot
     new_column = (column + 1)
+    next_column_forward_coordinates = (new_column, row)
+
+    return next_column_forward_coordinates
+
+
+def pc_next_row_down():
+    last_successful_shot = pc_successful_shots[-1]
+    print("Last hit:", last_successful_shot)
+    (column, row) = last_successful_shot
     new_row = (row + 1)
-    near_shot = (new_column, row)
+    next_row_down_coordinates = (column, new_row)
 
-    return near_shot
+    return next_row_down_coordinates
 
 
-def decide_where_to():
-    if pc_shot in pc_successful_shots:
-        pc_near_shot()
+def pc_decide_where_to_send_missiles():
+    if len(pc_successful_shots) == 0 and len(pc_missed_shots) == 0:
+        pc_shot = pc_random_shot()
+        print("PC made random shot")
+    elif len(pc_successful_shots) == 0:
+        pc_shot = pc_random_shot()
+        print("PC made random shot after previous missed shot")
     else:
-        print("New random shot", pc_random_shot())
+        pc_shot = pc_next_column_forward()
+        print(f"PC made next column shot {pc_shot}")
+        if pc_shot in pc_successful_shots or pc_shot in pc_missed_shots:
+            print("Next column forward coordinates were already used")
+            pc_shot = pc_next_row_down()
+            print("PC made next row down shot")
+            if pc_shot in pc_missed_shots:
+                print("Next row coordinates were already used. New random shot.")
+                pc_shot = pc_random_shot()
+
+    return pc_shot
 
 
 def check_pc_shot():
 
     print(f"Computer is sending missiles...")
-    decide_where_to()
+    pc_shot = pc_decide_where_to_send_missiles()
 
     if pc_shot in player_fleet:
         print(f"Damn! Enemy strike at {pc_shot} was successful!")
@@ -59,7 +81,7 @@ def check_pc_shot():
 
 
 
-for i in range(3):
+for i in range(10):
     check_pc_shot()
     print("Missed: ", pc_missed_shots)
     print("Good: ", pc_successful_shots)

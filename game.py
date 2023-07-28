@@ -237,6 +237,65 @@ def check_pc_target_size(pc_shot):
         small_ships.remove(pc_shot)
 
 
+# pc making shots strategy
+pc_missed_shots = []
+pc_successful_shots = []
+
+# making random shot
+
+
+def pc_random_shot():
+    pc_choice_column = random.randint(0, 9)
+    pc_choice_row = random.randint(0, 9)
+    pc_shot = (pc_choice_column, pc_choice_row)  # creating tuple from both random inputs
+
+    return pc_shot
+
+
+# pc deciding where to make next shot in every iteration
+
+
+def pc_next_column_forward():
+    last_successful_shot = pc_successful_shots[-1]
+    print("Last hit:", last_successful_shot)
+    (column, row) = last_successful_shot
+    new_column = (column + 1)
+    next_column_forward_coordinates = (new_column, row)
+
+    return next_column_forward_coordinates
+
+
+def pc_next_row_down():
+    last_successful_shot = pc_successful_shots[-1]
+    print("Last hit:", last_successful_shot)
+    (column, row) = last_successful_shot
+    new_row = (row + 1)
+    next_row_down_coordinates = (column, new_row)
+
+    return next_row_down_coordinates
+
+
+def pc_decide_where_to_send_missiles():
+    if len(pc_successful_shots) == 0 and len(pc_missed_shots) == 0:
+        pc_shot = pc_random_shot()
+        print("PC made random shot")
+    elif len(pc_successful_shots) == 0:
+        pc_shot = pc_random_shot()
+        print("PC made random shot after previous missed shot")
+    else:
+        pc_shot = pc_next_column_forward()
+        print(f"PC made next column shot {pc_shot}")
+        if pc_shot in pc_successful_shots or pc_shot in pc_missed_shots:
+            print("Next column forward coordinates were already used")
+            pc_shot = pc_next_row_down()
+            print("PC made next row down shot")
+            if pc_shot in pc_missed_shots:
+                print("Next row coordinates were already used. New random shot.")
+                pc_shot = pc_random_shot()
+
+    return pc_shot
+
+
 # iteration of moves
 
 def players_moves(computer_fleet, player_fleet):
@@ -290,20 +349,21 @@ def players_moves(computer_fleet, player_fleet):
                 used_coordinates.append(coordinates)  # for checking already used coordinates
 
         # computer's turn
-        pc_choice_column = random.randint(0, 9)
-        pc_choice_row = random.randint(0, 9)
-        pc_shot = (pc_choice_column, pc_choice_row)  # creating tuple from both random inputs
+
         print(f"Computer is sending missiles...")
+        pc_shot = pc_decide_where_to_send_missiles()
         if pc_shot in player_fleet:
             print(f"Damn! Enemy strike at {pc_shot} was successful!")
             player_fleet.remove(pc_shot)
             check_pc_target_size(pc_shot)
             computer_score += 1
             print("Computer score: ", computer_score)
+            pc_successful_shots.append(pc_shot)  # add successful shot to the list for next iteration
             if len(player_fleet) == 0:
                 print("Ay, caramba! Your fleet was destroyed!")
         elif pc_shot not in player_fleet:
             print(f"Computer missed at {pc_shot}")
+            pc_missed_shots.append(pc_shot)  # add missed shot to the list for next iteration
 
 
 # the main function for playing game
