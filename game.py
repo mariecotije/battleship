@@ -4,6 +4,7 @@ import random
 # create map for the player
 def create_map(ship_coordinates):
     """A function that takes as an argument list of player's ship coordinates and prints a map with X as ship mark"""
+    print(0, 1, 2, 3, 4, 5, 6, 7, 8, 9)
     grid = [['.' for _ in range(10)] for _ in range(10)]  # Create a 10x10 grid filled with dots
 
     for coordinate in ship_coordinates:
@@ -183,7 +184,6 @@ def create_ship(ship_size):
 
 
 def create_computer_fleet():
-
     # create and add big ship to the main list
     create_pc_big_ship = create_ship(5)
     pc_big_ship.extend(create_pc_big_ship)
@@ -241,10 +241,11 @@ def check_pc_target_size(pc_shot):
 pc_missed_shots = []
 pc_successful_shots = []
 
-# making random shot
-
 
 def pc_random_shot():
+    """A function for new random pair of coordinates for pc shot.
+    Column and row numbers are chosen from the range 0-9 and put together as a tuple.
+    Function returns a pair of coordinates as a tuple."""
     pc_choice_column = random.randint(0, 9)
     pc_choice_row = random.randint(0, 9)
     pc_shot = (pc_choice_column, pc_choice_row)  # creating tuple from both random inputs
@@ -298,19 +299,50 @@ def pc_decide_where_to_send_missiles():
 
 # iteration of moves
 
+# list of player's shot for the map to print after each round
+player_successful_shots = []
+player_missed_shots = []
+
+
+# print map of shots for player
+def show_already_made_player_shots(successful_shots, missed_shots):
+    print("Check your previous shots:")
+    print(0, 1, 2, 3, 4, 5, 6, 7, 8, 9)
+    grid = [['.' for _ in range(10)] for _ in range(10)]  # Create a 10x10 grid filled with dots
+
+    for coordinate in successful_shots:
+        column, row = coordinate
+        if 0 <= column < 10 and 0 <= row < 10:  # Check if the coordinate is within the grid boundaries
+            grid[row][column] = 'X'  # Place the sign at the hit ship
+
+    for coordinate in missed_shots:
+        column, row = coordinate
+        if 0 <= column < 10 and 0 <= row < 10:  # Check if the coordinate is within the grid boundaries
+            grid[row][column] = 'O'  # Place the sign at the missed coordinate
+
+        # Print the map using nested for loops
+    for column in grid:
+        for row in column:
+            print(row, end=' ')
+        print()
+
+
 def players_moves(computer_fleet, player_fleet):
     """A function for main iteration between players.
     User is making first move by inserting 2 numbers separated by space. Input is converted to tuple.
-    If the tuple is in the list of the user's fleet, the ship is destroyed and the tuple is removed from the list.
+    If the tuple is in the list of the computer's fleet, the ship is destroyed and the tuple is removed from the list.
     Next move is for computer.
-    Computer input is generated tuple from 2 random integers. The same logic for destroyed ship.
+    Computer input is generated tuple from 2 random integers.
+    If computer hit player's ship in the previous move, it moves 1 column or row forward.
+    If next to successful coordinates were used, computer generates new random coordinates.
+    The logic for destroyed ship is the same as for player's move.
     Iteration continues until one of the fleets is destroyed completely, means the list is empty."""
 
     # initial score for both players
     player_score = 0
     computer_score = 0
 
-    # messages to show when player hit the enemy ship
+    # different messages to show when player hit the enemy ship
     messages = [
         "You missed",
         "Impressive shot, but missed",
@@ -321,6 +353,7 @@ def players_moves(computer_fleet, player_fleet):
 
     # main iteration loop
     while computer_fleet != 0 and player_fleet != 0:
+        show_already_made_player_shots(player_successful_shots, player_missed_shots)
         try:
             player_input = input("Enter two space separated numbers 0-9 and press Enter: ")  # user  input
             coordinates = tuple(int(number) for number in player_input.split())  # converting user input to tuple
@@ -338,6 +371,7 @@ def players_moves(computer_fleet, player_fleet):
                 check_player_target_size(coordinates)
                 computer_fleet.remove(coordinates)
                 used_coordinates.append(coordinates)  # for checking already used coordinates
+                player_successful_shots.append(coordinates)  # add to the list for map of shots
                 player_score += 1
                 print("Your score: ", player_score)
                 if len(computer_fleet) == 0:
@@ -347,6 +381,7 @@ def players_moves(computer_fleet, player_fleet):
                 print("Your shot: ", coordinates)
                 print(random.choice(messages))  # show a random message form the list
                 used_coordinates.append(coordinates)  # for checking already used coordinates
+                player_missed_shots.append(coordinates)  # add to the list for map of shots
 
         # computer's turn
 
@@ -373,10 +408,11 @@ def play_battleship(start_game):
 
     # welcome message
     print("Ahoy Captain! Let's create your fleet!")
-
-    # initial score for both players
-    player_score = 0
-    computer_score = 0
+    print("Place your ships on the grid 10x10. Note that first position is 0 and last is 9.\n"
+          "Your fleet must have: one ship for 5 decks, two ships for 3 decks and three ships for 2 decks.\n"
+          "Insert coordinates for each deck in the format column(0-9), row(0-9) and check the list of coordinates.\n"
+          "Check the grid before placing ships.")
+    create_map([])
 
     # create fleet for the player
     players_fleet = enter_coordinates()
@@ -392,6 +428,10 @@ def play_battleship(start_game):
     computer_fleet = create_computer_fleet()
     print("Enemy fleet is ready for battle.\nYo Ho, Ho! Let's destroy some enemy ships!", computer_fleet)
     # just checking if it works, delete  computer fleet before sending!
+
+    # initial score for both players
+    player_score = 0
+    computer_score = 0
 
     # iteration of moves in guessing the opponent's ship location
     players_moves(computer_fleet, players_fleet)
