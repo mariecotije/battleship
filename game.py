@@ -4,8 +4,13 @@ import random
 # create map for the player
 def create_map(ship_coordinates):
     """A function that takes as an argument list of player's ship coordinates and prints a map with X as ship mark"""
-    print(0, 1, 2, 3, 4, 5, 6, 7, 8, 9)
-    grid = [['.' for _ in range(10)] for _ in range(10)]  # Create a 10x10 grid filled with dots
+    # Print the header with numbers from 0 to 10
+    print('  ', end='')
+    for i in range(10):
+        print(i, end=' ')
+    print()
+
+    grid = [['.' for row in range(10)] for column in range(10)]  # Create a 10x10 grid filled with dots
 
     for coordinate in ship_coordinates:
         column, row = coordinate
@@ -13,7 +18,8 @@ def create_map(ship_coordinates):
             grid[row][column] = 'X'  # Place the ship at the specified coordinate
 
     # Print the map using nested for loops
-    for column in grid:
+    for row_index, column in enumerate(grid):
+        print(row_index, end=' ')  # Print the row number
         for row in column:
             print(row, end=' ')
         print()
@@ -42,7 +48,7 @@ def enter_coordinates():  # create any ship coordinates tuple
         # ask player for the size of the ship to create
         # validation for the ship size input
         try:
-            ship_size = int(input("Enter the size of the ship you want to create (5, 3 or 2): "))
+            ship_size = int(input("Insert the size of the ship you want to create (5, 3 or 2) and press Enter : "))
         except ValueError:  # if user inserts non integer
             print("Only numbers 5, 3 and 2 are allowed. Try again.")
             continue
@@ -56,10 +62,10 @@ def enter_coordinates():  # create any ship coordinates tuple
             print("You already have big ship, choose another size.")
             continue
         elif ship_size == 3 and len(medium_ships) == 6:
-            print("You have reached the limit for medium ships.")
+            print("You have reached the limit for medium ships. Choose another size.")
             continue
         elif ship_size == 2 and len(small_ships) == 6:
-            print("You have reached the limit for small ships.")
+            print("You have reached the limit for small ships.Choose another size.")
             continue  # stop the iteration and ask again if the player already created some type of ships
 
         print(f"Let's create the {ship_size} decks long ship!")
@@ -71,12 +77,12 @@ def enter_coordinates():  # create any ship coordinates tuple
         # validation for the coordinates input
         while ship_length != ship_size:  # ask user to enter coordinates until the ship has required size
             try:
-                coordinates_column = int(input(f"Input column coordinate for the ship deck {deck} : "))
+                coordinates_column = int(input(f"Input COLUMN coordinate for the ship deck {deck} : "))
                 if coordinates_column < min_allowed_value or coordinates_column > max_allowed_value:
                     print("This position is out of grid. Insert number 0-9.")
                     continue
 
-                coordinates_row = int(input(f"Input row coordinate for the ship deck {deck} : "))
+                coordinates_row = int(input(f"Input ROW coordinate for the ship deck {deck} : "))
                 if coordinates_row < min_allowed_value or coordinates_row > max_allowed_value:
                     print("This position is out of grid. Insert number 0-9.")
                     continue
@@ -306,22 +312,30 @@ player_missed_shots = []
 
 # print map of shots for player
 def show_already_made_player_shots(successful_shots, missed_shots):
-    print("Check your previous shots:")
-    print(0, 1, 2, 3, 4, 5, 6, 7, 8, 9)
-    grid = [['.' for _ in range(10)] for _ in range(10)]  # Create a 10x10 grid filled with dots
+    """An updated function for printing map of player's shots.
+    A function takes 2 lists of coordinates as an argument and prints the grid."""
 
-    for coordinate in successful_shots:
+    # Print the header with numbers from 0 to 10
+    print('  ', end='')
+    for i in range(10):
+        print(i, end=' ')
+    print()
+
+    grid = [['.' for row in range(10)] for column in range(10)]
+
+    for coordinate in successful_shots:  # a for loop for successful shots
         column, row = coordinate
         if 0 <= column < 10 and 0 <= row < 10:  # Check if the coordinate is within the grid boundaries
             grid[row][column] = 'X'  # Place the sign at the hit ship
 
-    for coordinate in missed_shots:
+    for coordinate in missed_shots:  # a for loop for missed shots
         column, row = coordinate
         if 0 <= column < 10 and 0 <= row < 10:  # Check if the coordinate is within the grid boundaries
             grid[row][column] = 'O'  # Place the sign at the missed coordinate
 
         # Print the map using nested for loops
-    for column in grid:
+    for row_index, column in enumerate(grid):
+        print(row_index, end=' ')  # Print the row number
         for row in column:
             print(row, end=' ')
         print()
@@ -355,7 +369,7 @@ def players_moves(computer_fleet, player_fleet):
     while computer_fleet != 0 and player_fleet != 0:
         show_already_made_player_shots(player_successful_shots, player_missed_shots)
         try:
-            player_input = input("Enter two space separated numbers 0-9 and press Enter: ")  # user  input
+            player_input = input("Enter column and row coordinates (0-9) separated by 'SPACE' and press 'Enter': ")  # user  input
             coordinates = tuple(int(number) for number in player_input.split())  # converting user input to tuple
             if len(coordinates) < 2:  # prevent sending user input if not 2 coordinates
                 print("Two coordinates are needed for shot. Try again.")
@@ -404,20 +418,21 @@ def players_moves(computer_fleet, player_fleet):
 # the main function for playing game
 
 def play_battleship(start_game):
-    """a main function where the player and computer iterate in guessing the opponent's ship location"""
+    """The main function where the player and computer iterate in guessing the opponent's ship location.
+    A boolean value is taken as an argument for starting the game."""
 
     # welcome message
     print("Ahoy Captain! Let's create your fleet!")
     print("Place your ships on the grid 10x10. Note that first position is 0 and last is 9.\n"
           "Your fleet must have: one ship for 5 decks, two ships for 3 decks and three ships for 2 decks.\n"
-          "Insert coordinates for each deck in the format column(0-9), row(0-9) and check the list of coordinates.\n"
-          "Check the grid before placing ships.")
-    create_map([])
+          "Insert coordinates for each deck of the ship and check the list of coordinates.\n"
+          "Here is the empty grid for your ships.")
+    create_map([])  # show the empty map to the player
 
     # create fleet for the player
     players_fleet = enter_coordinates()
     print("Your fleet is ready! Check the map.")
-    create_map(players_fleet)  # create map after all ships are placed
+    create_map(players_fleet)  # create map after all ships are placed and show it to the player
 
     # show ships filtered by size
     print("Big ship: ", big_ship)
@@ -439,15 +454,17 @@ def play_battleship(start_game):
 
 # a function for playing game again util player ends it
 def start_new_game():
-    """The main function for starting game"""
+    """The main function for starting game. When the game is over, the function asks user for another round.
+    Start game boolean is sent as an argument to the play_battleship function."""
     start_game = True
 
-    while start_game:
+    while start_game:  # a loop for starting new game
         play_battleship(start_game)
-        ask_player = str(input("Do you want to play again? Press any key for YES or 'n' for NO: "))
+        ask_player = str(input("Do you want to play again? Enter any character for YES or 'n' for NO: "))
         if ask_player == "n":
-            print("Thank you for playing! Good bye!")
+            print("Thank you for playing! Good bye!")  # exit the game by command from player
             break
 
 
+# launch game
 start_new_game()

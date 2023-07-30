@@ -1,4 +1,4 @@
-from create_map import *
+from create_map import create_map
 import random
 
 pc_fleet = []  # a list for all coordinates to check occupied
@@ -7,6 +7,8 @@ pc_fleet = []  # a list for all coordinates to check occupied
 pc_big_ship = []  # a list for big ship
 pc_medium_ships = []  # a list for medium ships
 pc_small_ships = []  # a list for small ships
+
+near_coordinates = [(-1, -1), (0, -1), (1, -1), (-1, 0), (0, 0), (1, 0), (-1, 1), (0, 1), (1, 1)]
 
 
 def first_coordinates():
@@ -30,13 +32,24 @@ def is_enough_space(ship_size, chosen_orientation, start_coordinates):
         return True
 
 
+def create_near_ship_coordinates(ship_coordinates):
+    new_near_coordinates = []
+    for coordinates in ship_coordinates:
+        (column, row) = coordinates
+        for close_coordinates in near_coordinates:
+            (near_column, near_row) = close_coordinates
+            new_near_coordinates.append(((column + near_column), (row + near_row)))
+
+    return new_near_coordinates
+
+
 def position_is_occupied(ship_coordinates):
     """A function that checks coordinates in the whole fleet and returns response"""
-
-    for coordinates in ship_coordinates:
-        if coordinates in pc_fleet:
-            print(f"{ship_coordinates} is in fleet list")
+    near_ship_coordinates = create_near_ship_coordinates(ship_coordinates)
+    for near_coordinate_tuple in near_ship_coordinates:
+        if near_coordinate_tuple in pc_fleet:
             return True
+
     return False
 
 
