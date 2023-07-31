@@ -7,8 +7,8 @@ def create_map(ship_coordinates):
 
     # Print the header with letters from 'a' to 'j'
     print('   ', end='')  # Add an extra space for alignment
-    for letter in 'ABCDEFGHIJ':
-        print(letter, end=' ')
+    for column_index in 'ABCDEFGHIJ':
+        print(column_index, end=' ')
     print()
 
     grid = [['.' for row in range(10)] for column in range(10)]  # Create a 10x10 grid filled with dots
@@ -394,6 +394,10 @@ def pc_decide_where_to_send_missiles():
             if pc_shot in pc_missed_shots:
                 pc_shot = pc_random_shot()
 
+    (column, row) = pc_shot
+    if column > 9 or row > 9:
+        pc_shot = pc_random_shot()
+
     return pc_shot
 
 
@@ -407,15 +411,15 @@ player_missed_shots = []
 # print map of shots for player
 def show_already_made_player_shots(successful_shots, missed_shots):
     """An updated function for printing map of player's shots.
-    A function takes 2 lists of coordinates as an argument and prints the grid
+    A function takes 2 lists of coordinates as an argument and prints the grid.
     For successful shots is placed 'X'. For missed shots 'O'."""
 
     print("*MAP OF YOUR PREVIOUS SHOTS*")
 
     # Print the header with letters from 'a' to 'j'
     print('   ', end='')  # Add an extra space for alignment
-    for letter in 'ABCDEFGHIJ':
-        print(letter, end=' ')
+    for column_index in 'ABCDEFGHIJ':
+        print(column_index, end=' ')
     print()
 
     grid = [['.' for row in range(10)] for column in range(10)]
@@ -510,7 +514,7 @@ def players_moves(computer_fleet, player_fleet):
                 print("You already tried these coordinates. Insert another pair.")
                 continue
         except ValueError:  # prevent app from failing when user inserts non integer
-            print("Please enter target coordinates inside map, example: 'A1'.Try again.")
+            print("Please enter target coordinates inside map, example: 'A1'")
             continue
         else:
             if coordinates in computer_fleet:
