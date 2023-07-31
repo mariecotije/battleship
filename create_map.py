@@ -1,12 +1,13 @@
-ship_coordinates = [(1, 2), (1, 3), (6, 9), (7, 9), (6, 5), (7, 5)]
+# ship_coordinates = [(1, 2), (1, 3), (6, 9), (7, 9), (6, 5), (7, 5)]
 
 
 def create_map(ship_coordinates):
     """A function that takes as an argument list of player's ship coordinates and prints a map with X as ship mark"""
-    # Print the header with numbers from 0 to 10
-    print('  ', end='')
-    for i in range(10):
-        print(i, end=' ')
+
+    # Print the header with letters from 'a' to 'j'
+    print('   ', end='')  # Add an extra space for alignment
+    for letter in 'ABCDEFGHIJ':
+        print(letter, end=' ')
     print()
 
     grid = [['.' for row in range(10)] for column in range(10)]  # Create a 10x10 grid filled with dots
@@ -18,10 +19,13 @@ def create_map(ship_coordinates):
 
     # Print the map using nested for loops
     for row_index, column in enumerate(grid):
-        print(row_index, end=' ')  # Print the row number
+        print(f"{row_index + 1:2}", end=' ')  # Print the row number with 2 characters (right-aligned)
         for row in column:
             print(row, end=' ')
         print()
 
 
-create_map(ship_coordinates)
+# ship_coordinates = [(1, 2), (1, 3), (6, 9), (7, 9), (6, 5), (7, 5)]
+# create_map(ship_coordinates)
+
+

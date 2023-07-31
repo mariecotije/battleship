@@ -4,10 +4,11 @@ import random
 # create map for the player
 def create_map(ship_coordinates):
     """A function that takes as an argument list of player's ship coordinates and prints a map with X as ship mark"""
-    # Print the header with column numbers from 0 to 9
-    print('  ', end='')
-    for column_index in range(10):
-        print(column_index, end=' ')
+
+    # Print the header with letters from 'a' to 'j'
+    print('   ', end='')  # Add an extra space for alignment
+    for letter in 'ABCDEFGHIJ':
+        print(letter, end=' ')
     print()
 
     grid = [['.' for row in range(10)] for column in range(10)]  # Create a 10x10 grid filled with dots
@@ -19,7 +20,7 @@ def create_map(ship_coordinates):
 
     # Print the map using nested for loops
     for row_index, column in enumerate(grid):
-        print(row_index, end=' ')  # Print the row number
+        print(f"{row_index + 1:2}", end=' ')  # Print the row number with 2 characters (right-aligned)
         for row in column:
             print(row, end=' ')
         print()
@@ -33,16 +34,57 @@ small_ships = []
 
 
 # create player fleet
+def convert_coordinates(position_input):
+    """A function that takes user input with inserted coordinates.
+    If there is no letter in the coordinates input, both int are converted to tuple and returned.
+    Column is converted from letter to number using 'switch'.
+    Row is counted -1 to place according to rows indexes on the grid.
+    Function returns tuple of coordinates that can be read by other functions for placing ships."""
+    column = position_input[0]
+    row = position_input[1:]
+    row_int = int(row)  # convert string to int
+    if column == int:
+        map_coordinates = (column, (row - 1))  # create tuple for verification
+    else:
+        column = str(column.upper())  # convert user input to string and to uppercase for switch
+
+        match column:  # switch for column converter
+            case "A":  # convert letter to number
+                column = 0
+            case "B":
+                column = 1
+            case "C":
+                column = 2
+            case "D":
+                column = 3
+            case "E":
+                column = 4
+            case "F":
+                column = 5
+            case "G":
+                column = 6
+            case "H":
+                column = 7
+            case "I":
+                column = 8
+            case "J":
+                column = 9
+
+        map_coordinates = (int(column), (row_int - 1))  # create a tuple for coordinates on the grid, move row index
+
+    return map_coordinates
+
+
 def enter_coordinates():
-    """A function for player to create all needed ships.
-    Until list of all coordinates is full, the function requires user input for coordinates.
-    First player is asked to choose a ship size, then using while loop, a player is asked for each deck coordinates.
-    Input for column and row is added to the main list as a tuple.
-    Coordinates for each ship size list are added as well as tuples.
-    The output of the function is later used as an input for 'create_map' function to show ships on the map."""
+    """A function for ships creation for player.
+    A player is asked for an input to place ships on map.
+    An input is converted to tuple and added to the list of ships based on the size.
+    All ships are combined to the player's fleet.
+    Function returns list of all ships coordinates as player's fleet."""
 
     # lists for verification of the amount of concrete types
     fleet = []
+    placed_ships = []  # a list for player to show already used coordinates
 
     ships = [2, 3, 5]  # list of ship sizes for verification of input ship_size
 
@@ -52,8 +94,9 @@ def enter_coordinates():
     while len(fleet) != 17:  # run the process until all ships are created
 
         # ask player for the size of the ship to create
+        # validation for the ship size input
         try:
-            ship_size = int(input("Enter the size of the ship you want to create (5, 3 or 2) : "))
+            ship_size = int(input("Enter the size of the ship you want to create (5, 3 or 2): "))
         except ValueError:  # if user inserts non integer
             print("Only numbers 5, 3 and 2 are allowed. Try again.")
             continue
@@ -82,36 +125,41 @@ def enter_coordinates():
         # validation for the coordinates input
         while ship_length != ship_size:  # ask user to enter coordinates until the ship has required size
             try:
-                coordinates_column = int(input(f"Enter COLUMN coordinate for the ship deck {deck} : "))
-                if coordinates_column < min_allowed_value or coordinates_column > max_allowed_value:
-                    print("This position is out of grid. Insert number 0-9.")
+                deck_coordinates = input(f"Input coordinate for the ship deck {deck} : ")
+                converted_coordinates = convert_coordinates(deck_coordinates)
+                (column, row) = converted_coordinates
+
+                if column < min_allowed_value or column > max_allowed_value:
+                    print("This position is out of grid. Choose another position.")
                     continue
 
-                coordinates_row = int(input(f"Enter ROW coordinate for the ship deck {deck} : "))
-                if coordinates_row < min_allowed_value or coordinates_row > max_allowed_value:
-                    print("This position is out of grid. Insert number 0-9.")
+                elif row < min_allowed_value or row > max_allowed_value:
+                    print("This position is out of grid. Choose another position.")
                     continue
 
-                if (coordinates_column, coordinates_row) not in fleet:  # if position is available, add to fleet
+                if converted_coordinates not in fleet:  # if position is available, add to fleet
                     if ship_size == 5:
-                        big_ship.append((coordinates_column, coordinates_row))
+                        big_ship.append(converted_coordinates)
                     elif ship_size == 3:
-                        medium_ships.append((coordinates_column, coordinates_row))
+                        medium_ships.append(converted_coordinates)
                     elif ship_size == 2:
-                        small_ships.append((coordinates_column, coordinates_row))
+                        small_ships.append(converted_coordinates)
 
                     ship_length += 1
                     deck += 1
 
                     fleet = big_ship + medium_ships + small_ships  # join all lists to one for iteration
+                    placed_ships.append(deck_coordinates)
+                    create_map(fleet)
 
                 else:  # handling occupied position
                     print("You already placed ship there. Choose another position.")
                     continue
             except ValueError:  # handling incorrect input type
-                print("Only numbers are allowed. Try again.")
+                print("Enter position with both coordinates like 'a1'. Try again.")
                 continue
-        print("Your fleet: ", fleet)
+
+        print("Placed ships: ", placed_ships)
 
     return fleet
 
@@ -130,7 +178,7 @@ near_coordinates = [(-1, -1), (0, -1), (1, -1), (-1, 0), (0, 0), (1, 0), (-1, 1)
 
 
 def first_coordinates():
-    """A function that randomly creates a tuple of coordinates (column, row)."""
+    """A function that creates and returns a tuple of random coordinates (column, row)."""
     column = random.randint(0, 9)
     row = random.randint(0, 9)
 
@@ -256,13 +304,13 @@ def check_player_target_size(coordinates):
     If coordinates are found in a list, they are removed from it."""
 
     if coordinates in pc_big_ship:
-        print("You hit big ship of 5 decks!")
+        print("You hit BIG ship of 5 decks!")
         pc_big_ship.remove(coordinates)
     elif coordinates in pc_medium_ships:
-        print("Nice! Medium ship is damaged!")
+        print("Nice! MEDIUM size ship is damaged!")
         pc_medium_ships.remove(coordinates)
     elif coordinates in pc_small_ships:
-        print("Small ship is hit!")
+        print("SMALL size ship was hit!")
         pc_small_ships.remove(coordinates)
 
 
@@ -275,13 +323,13 @@ def check_pc_target_size(pc_shot):
     Coordinates are removed from the list."""
 
     if pc_shot in big_ship:
-        print("Oh no! Computer hit your biggest ship!")
+        print("Oh no! Computer hit your BIG ship!")
         big_ship.remove(pc_shot)
     elif pc_shot in medium_ships:
-        print("Your medium size ship was hit by computer!")
+        print("Your MEDIUM size ship was hit by computer!")
         medium_ships.remove(pc_shot)
     elif pc_shot in small_ships:
-        print("Computer hit a small ship!")
+        print("Computer hit a SMALL size ship!")
         small_ships.remove(pc_shot)
 
 
@@ -362,12 +410,12 @@ def show_already_made_player_shots(successful_shots, missed_shots):
     A function takes 2 lists of coordinates as an argument and prints the grid
     For successful shots is placed 'X'. For missed shots 'O'."""
 
-    print("*YOUR PREVIOUS SHOTS*")
+    print("*MAP OF YOUR PREVIOUS SHOTS*")
 
-    # Print the header with column numbers from 0 to 9
-    print('  ', end='')
-    for column_index in range(10):
-        print(column_index, end=' ')
+    # Print the header with letters from 'a' to 'j'
+    print('   ', end='')  # Add an extra space for alignment
+    for letter in 'ABCDEFGHIJ':
+        print(letter, end=' ')
     print()
 
     grid = [['.' for row in range(10)] for column in range(10)]
@@ -382,12 +430,42 @@ def show_already_made_player_shots(successful_shots, missed_shots):
         if 0 <= column < 10 and 0 <= row < 10:  # Check if the coordinate is within the grid boundaries
             grid[row][column] = 'O'  # Place the sign at the missed coordinate
 
-        # Print the map using nested for loops
+    # Print the map using nested for loops
     for row_index, column in enumerate(grid):
-        print(row_index, end=' ')  # Print the row number
+        print(f"{row_index + 1:2}", end=' ')  # Print the row number with 2 characters (right-aligned)
         for row in column:
             print(row, end=' ')
         print()
+
+
+def convert_pc_coordinates(pc_tuple_coordinates):
+    (column, row) = pc_tuple_coordinates
+
+    match column:
+        case 0:
+            column = "A"
+        case 1:
+            column = "B"
+        case 2:
+            column = "C"
+        case 3:
+            column = "D"
+        case 4:
+            column = "E"
+        case 5:
+            column = "F"
+        case 6:
+            column = "G"
+        case 7:
+            column = "H"
+        case 8:
+            column = "I"
+        case 9:
+            column = "J"
+
+    converted_pc_coordinates = (column, (row + 1))
+
+    return converted_pc_coordinates
 
 
 def players_moves(computer_fleet, player_fleet):
@@ -419,16 +497,20 @@ def players_moves(computer_fleet, player_fleet):
     while computer_fleet != 0 and player_fleet != 0:
         show_already_made_player_shots(player_successful_shots, player_missed_shots)
         try:  # user  input
-            player_input = input("Write column & row coordinates separated by space (e.g. 5 0) and press 'Enter': ")
-            coordinates = tuple(int(number) for number in player_input.split())  # converting user input to tuple
+            player_input = input("Enter target coordinates: ")
+            coordinates = convert_coordinates(player_input)  # converting user input to tuple
+            (column, row) = coordinates  # unpack tuple for verification
             if len(coordinates) < 2:  # prevent sending user input if not 2 coordinates
                 print("Two coordinates are needed for shot. Try again.")
+                continue
+            elif column < 0 or column > 9 or row < 0 or row > 9:
+                print("These coordinates are out of the map. Try again.")
                 continue
             elif coordinates in used_coordinates:
                 print("You already tried these coordinates. Insert another pair.")
                 continue
         except ValueError:  # prevent app from failing when user inserts non integer
-            print("Please enter 2 space separated numbers in range 0-9.")
+            print("Please enter target coordinates inside map, example: 'A1'.Try again.")
             continue
         else:
             if coordinates in computer_fleet:
@@ -442,7 +524,6 @@ def players_moves(computer_fleet, player_fleet):
                     print("Congratulations! You sunk all the computer's ships! GAME OVER")
                     break
             elif coordinates not in computer_fleet:
-                print("Your shot: ", coordinates)
                 print(random.choice(messages))  # show a random message form the list
                 used_coordinates.append(coordinates)  # for checking already used coordinates
                 player_missed_shots.append(coordinates)  # add to the list for map of shots
@@ -451,8 +532,9 @@ def players_moves(computer_fleet, player_fleet):
 
         print(f"Computer is sending missiles...")
         pc_shot = pc_decide_where_to_send_missiles()
+        converted_pc_shot_for_user = convert_pc_coordinates(pc_shot)
         if pc_shot in player_fleet:
-            print(f"Damn! Enemy strike at {pc_shot} was successful!")
+            print(f"DAMN! Enemy strike at {converted_pc_shot_for_user} was successful!")
             player_fleet.remove(pc_shot)
             check_pc_target_size(pc_shot)
             computer_score += 1
@@ -461,7 +543,7 @@ def players_moves(computer_fleet, player_fleet):
             if len(player_fleet) == 0:
                 print("Ay, caramba! Your fleet was destroyed!")
         elif pc_shot not in player_fleet:
-            print(f"Computer missed at {pc_shot}")
+            print(f"Computer missed at {converted_pc_shot_for_user}")
             pc_missed_shots.append(pc_shot)  # add missed shot to the list for next iteration
 
 
@@ -476,11 +558,10 @@ def play_battleship(start_game):
 
     # welcome message
     print("Ahoy Captain! Let's create your fleet!")
-    print("Place your ships on the grid 10x10. Note that first position is 0 and last is 9.\n"
+    print("Place your ships on the grid 10x10. Column indexes are A - H. Rows are 1 - 10.\n"
           "Your fleet must have: one ship for 5 decks, two ships for 3 decks and three ships for 2 decks.\n"
-          "For each part of the ship the column and row coordinates are entered separately.\n"
-          "In case of mistake it is possible to enter both coordinates again.\n"
-          "Check the list of inserted coordinates, for correct placement of the next ship part.\n"
+          "Check the map with already placed ships before creating next one.\n"
+          "Insert coordinates like 'a1' or 'A1'\n"
           "Here is the grid for your ships.")
     create_map([])  # show the empty map to the player
 
@@ -488,11 +569,6 @@ def play_battleship(start_game):
     players_fleet = enter_coordinates()
     print("Your fleet is ready! Check the map.")
     create_map(players_fleet)  # create map after all ships are placed and show it to the player
-
-    # show ships filtered by size
-    print("Big ship: ", big_ship)
-    print("Medium ships: ", medium_ships)
-    print("Small ships: ", small_ships)
 
     # fleet is created for pc
     computer_fleet = create_computer_fleet()
@@ -504,6 +580,20 @@ def play_battleship(start_game):
 
     # iteration of moves in guessing the opponent's ship location
     players_moves(computer_fleet, players_fleet)
+
+    # clear all ships lists when game is over
+    big_ship.clear()
+    medium_ships.clear()
+    small_ships.clear()
+    players_fleet.clear()
+    computer_fleet.clear()
+    pc_big_ship.clear()
+    pc_medium_ships.clear()
+    pc_small_ships.clear()
+    pc_missed_shots.clear()
+    pc_successful_shots.clear()
+    player_successful_shots.clear()
+    player_missed_shots.clear()
 
 
 # a function for playing game again util player ends it
