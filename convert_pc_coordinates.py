@@ -28,5 +28,3 @@ def convert_pc_coordinates(pc_tuple_coordinates):
     return converted_pc_coordinates
 
 
-pc_shot = (9, 9)
-print(convert_pc_coordinates(pc_shot))
