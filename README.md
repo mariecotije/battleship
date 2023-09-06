@@ -9,5 +9,5 @@ A game for 1 player against computer.
 
 ## Requirements
 
-Python 3.10+
-CLI
+- Python 3.10+
+- CLI
